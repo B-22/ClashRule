@@ -1,3 +1,101 @@
+
+parsers: # array
+  #匹配所有这个开头的规则
+  - reg: https://(acl4ssr-sub|sub.xeton).dev.+$
+    yaml:
+      #mix-object:
+       # authentication:
+        #  - "proxy:K"
+      append-proxies: #添加自定义节点
+        - name: "socks5 代理"
+          type: socks5
+          server: geo.
+          port: 42
+          username: 
+          password: 
+          # tls: true
+          # skip-cert-verify: true
+          # udp: true
+      append-proxy-groups: # 添加自定义策略组
+        - name: 🇹🇷 土耳其节点
+          type: select
+          url: http://www.gstatic.com/generate_204
+          interval: 300
+          proxies:
+            - DIRECT
+            - 🚀 节点选择
+        - name: 🇪🇺 欧洲节点
+          type: select
+          url: http://www.gstatic.com/generate_204
+          interval: 300
+          proxies:
+            - DIRECT
+            - 🚀 节点选择
+        - name: 🇪🇺 欧盟节点
+          type: select
+          url: http://www.gstatic.com/generate_204
+          interval: 300
+          proxies:
+            - DIRECT
+            - 🚀 节点选择
+        - name: 🚰 大流量
+          type: select
+          url: http://www.gstatic.com/generate_204
+          interval: 300
+          proxies:
+            - DIRECT
+          use:
+            - hightraffic
+            #- hightraffic2
+        - name: 🚰 大流量选择器
+          type: select
+          url: http://www.gstatic.com/generate_204
+          interval: 300
+          proxies:
+            - DIRECT
+          use:
+            - hightraffic
+            #- hightraffic2
+        - name: 🚰 大流量负载均衡
+          type: load-balance
+          url: http://www.gstatic.com/generate_204
+          interval: 300
+          use:
+            - hightraffic
+            #- hightraffic2
+        - name: 🚰 大流量自动选择
+          type: url-test
+          url: http://www.gstatic.com/generate_204
+          interval: 300
+          use:
+            - hightraffic
+            #- hightraffic2
+      mix-proxy-providers:  #添加自定义规则组
+        hightraffic: 
+          type: http 
+          path: ./Proxy/hightraffic.yaml 
+          #大流量机场的订阅链接，需要是 clash 格式
+          url: https://
+          interval: 21600 
+          health-check:  
+              enable: true
+              url: http://www.gstatic.com/generate_204
+              interval: 300
+      commands:
+        # 向 策略组 内添加节点
+        #- proxy-groups.🚰 大流量.proxies=[]proxyNames|^(?=(.Trojan.*(香港)))\1((?!(Hongkong)).)*$
+        #- proxy-groups.🚰 大流量负载均衡.proxies=[]proxyNames|^(?=(.Trojan.*(香港)))\1((?!(Hongkong)).)*$
+        # 向 其他策略组 添加 该策略组
+        - proxy-groups.🚀 节点选择.proxies.0+🚰 大流量 # 向 🚀 节点选择 策略组添加组名🚰大流量  
+        - proxy-groups.🚀 节点选择.proxies.0+🚰 大流量负载均衡
+        - proxy-groups.🚀 节点选择.proxies.0+🚰 大流量自动选择
+        - proxy-groups.Ⓜ️ 微软云盘.proxies.0+🚰 大流量
+        - proxy-groups.Ⓜ️ 微软云盘.proxies.0+🚰 大流量负载均衡
+        - proxy-groups.Ⓜ️ 微软云盘.proxies.0+🚰 大流量自动选择
+
+      prepend-rules:  #添加自定义规则
+        # 自定义开始
+        - DOMAIN-SUFFIX,example.com,♻️ 自动选择
 #---------------------------------------------------#
 # 配置文件需要放置在 $HOME/.config/clash/config.yml
 # 或者运行目录下的config.yml
